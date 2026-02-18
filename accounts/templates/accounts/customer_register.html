@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Customer Registration - Vehicle Service</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 15px;
+            color: #1e293b;
+        }
+
+        .register-container {
+            background: white;
+            width: 100%;
+            max-width: 460px;
+            border-radius: 16px;
+            box-shadow: 0 10px 38px rgba(0, 0, 0, 0.09),
+                        0 4px 12px rgba(0, 0, 0, 0.07);
+            overflow: hidden;
+        }
+
+        .header {
+            background: #0f172a;
+            color: white;
+            padding: 2.3rem 2rem 1.9rem;
+            text-align: center;
+        }
+
+        .header h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            letter-spacing: -0.4px;
+        }
+
+        .header p {
+            margin-top: 0.5rem;
+            font-size: 0.98rem;
+            opacity: 0.85;
+        }
+
+        .form-content {
+            padding: 2.3rem 2.5rem 2.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.94rem;
+            font-weight: 500;
+            color: #334155;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.95rem 1.15rem;
+            margin-bottom: 1.3rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: #f8fafc;
+            transition: all 0.2s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.14);
+            background: white;
+        }
+
+        input::placeholder {
+            color: #94a3b8;
+            opacity: 1;
+        }
+
+        button {
+            width: 100%;
+            padding: 1.05rem;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.04rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            margin: 1.8rem 0 1.4rem;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+            box-shadow: 0 7px 18px rgba(37, 99, 235, 0.28);
+        }
+
+        .back-link {
+            text-align: center;
+            font-size: 0.96rem;
+            color: #64748b;
+            margin-top: 1rem;
+        }
+
+        .back-link a {
+            color: #2563eb;
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .back-link a:hover {
+            color: #1d4ed8;
+            text-decoration: underline;
+        }
+
+        @media (max-width: 480px) {
+            .form-content {
+                padding: 2rem 1.8rem;
+            }
+            .header {
+                padding: 2rem 1.8rem 1.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="register-container">
+    <div class="header">
+        <h2>Join as Customer</h2>
+        <p>Get fast & reliable vehicle service bookings</p>
+    </div>
+
+    <div class="form-content">
+        <form method="post">
+            {% csrf_token %}
+
+            <label for="name">Full Name</label>
+            <input type="text" name="username" id="name" placeholder="Your full name" required>
+
+            <label for="phone">Phone Number</label>
+            <input type="text" name="phone" id="phone" placeholder="+91 98765 43210" required>
+
+            <label for="email">Email (optional)</label>
+            <input type="email" name="email" id="email" placeholder="you@example.com">
+
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password" placeholder="Create a strong password" required>
+
+            <label for="vehicle_number">Vehicle Number / Registration</label>
+            <input type="text" name="vehicle_number" id="vehicle_number" placeholder="KL 07 AB 1234" required>
+
+            <label for="vehicle_type">Vehicle Type</label>
+            <input type="text" name="vehicle_type" id="vehicle_type" placeholder="e.g. Honda Activa, Maruti Swift, Royal Enfield" required>
+
+            <button type="submit">Register as Customer</button>
+        </form>
+
+        <div class="back-link">
+            Already have an account? <a href="{% url 'login' %}">Login here</a>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

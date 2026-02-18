@@ -1,0 +1,127 @@
+{% extends 'adminpanel/base_admin.html' %}
+
+{% block title %}Approved Bills{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .filter-bar {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .filter-btn {
+        padding: 0.7rem 1.2rem;
+        border: 2px solid #e2e8f0;
+        background: white;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        color: #475569;
+    }
+
+    .filter-btn.active {
+        background: #3b82f6;
+        color: white;
+        border-color: #3b82f6;
+    }
+
+    .bills-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .bills-table th {
+        background: #f8fafc;
+        padding: 1rem;
+        text-align: left;
+        font-weight: 600;
+        color: #475569;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+    }
+
+    .bills-table td {
+        padding: 1rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .bills-table tr:hover {
+        background: #f8fafc;
+    }
+
+    .status-badge {
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .status-paid {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .status-unpaid {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Approved Bills</h1>
+    <p class="page-subtitle">View all approved bills and their payment status</p>
+</div>
+
+<div class="content-wrapper">
+    <div class="filter-bar">
+        <a href="?status=all" class="filter-btn {% if status_filter == 'all' %}active{% endif %}">All Bills</a>
+        <a href="?status=paid" class="filter-btn {% if status_filter == 'paid' %}active{% endif %}">Paid</a>
+        <a href="?status=unpaid" class="filter-btn {% if status_filter == 'unpaid' %}active{% endif %}">Unpaid</a>
+    </div>
+
+    {% if bills %}
+    <table class="bills-table">
+        <thead>
+            <tr>
+                <th>Bill ID</th>
+                <th>Customer</th>
+                <th>Mechanic</th>
+                <th>Approved Date</th>
+                <th>Total Amount</th>
+                <th>Payment Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for bill in bills %}
+            <tr>
+                <td>#{{ bill.id }}</td>
+                <td>{{ bill.jobcard.booking.customer.user.username }}</td>
+                <td>{{ bill.jobcard.mechanic.username }}</td>
+                <td>{{ bill.approved_at|date:"M d, Y" }}</td>
+                <td>₹{{ bill.total_amount }}</td>
+                <td>
+                    {% if bill.is_paid %}
+                    <span class="status-badge status-paid">Paid</span>
+                    {% else %}
+                    <span class="status-badge status-unpaid">Unpaid</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div style="text-align: center; padding: 3rem; color: #64748b;">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">📜</div>
+        <p>No bills found</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

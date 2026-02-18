@@ -1,0 +1,207 @@
+{% extends 'adminpanel/base_admin.html' %}
+
+{% block title %}Pending Bills{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .bills-grid {
+        display: grid;
+        gap: 1.5rem;
+    }
+
+    .bill-card {
+        background: white;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 1.5rem;
+        transition: all 0.2s ease;
+    }
+
+    .bill-card:hover {
+        border-color: #cbd5e1;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .bill-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    .bill-id {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    .bill-badge {
+        background: #fef3c7;
+        color: #92400e;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .bill-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .detail-box {
+        background: #f8fafc;
+        padding: 1rem;
+        border-radius: 8px;
+    }
+
+    .detail-label {
+        font-size: 0.85rem;
+        color: #64748b;
+        margin-bottom: 0.4rem;
+    }
+
+    .detail-value {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #0f172a;
+    }
+
+    .parts-section {
+        margin-bottom: 1.5rem;
+    }
+
+    .parts-title {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 0.8rem;
+        color: #0f172a;
+    }
+
+    .parts-list {
+        background: #f8fafc;
+        border-radius: 8px;
+        padding: 1rem;
+    }
+
+    .part-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.6rem 0;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .part-item:last-child {
+        border-bottom: none;
+    }
+
+    .part-name {
+        font-weight: 500;
+    }
+
+    .part-price {
+        font-weight: 600;
+        color: #0f172a;
+    }
+
+    .btn-review {
+        background: #3b82f6;
+        color: white;
+        padding: 0.8rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.2s ease;
+    }
+
+    .btn-review:hover {
+        background: #2563eb;
+        transform: translateY(-1px);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #64748b;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Pending Bills</h1>
+    <p class="page-subtitle">Review and approve bills submitted by mechanics</p>
+</div>
+
+<div class="content-wrapper">
+    {% if bills %}
+    <div class="bills-grid">
+        {% for bill in bills %}
+        <div class="bill-card">
+            <div class="bill-header">
+                <div class="bill-id">Bill #{{ bill.id }}</div>
+                <span class="bill-badge">⏳ Pending Review</span>
+            </div>
+
+            <div class="bill-details">
+                <div class="detail-box">
+                    <div class="detail-label">Customer</div>
+                    <div class="detail-value">{{ bill.jobcard.booking.customer.user.username }}</div>
+                </div>
+                <div class="detail-box">
+                    <div class="detail-label">Mechanic</div>
+                    <div class="detail-value">{{ bill.jobcard.mechanic.username }}</div>
+                </div>
+                <div class="detail-box">
+                    <div class="detail-label">Service Type</div>
+                    <div class="detail-value">{{ bill.jobcard.booking.get_service_type_display }}</div>
+                </div>
+                <div class="detail-box">
+                    <div class="detail-label">Labour Hours</div>
+                    <div class="detail-value">{{ bill.jobcard.get_labour_hours }} hrs</div>
+                </div>
+            </div>
+
+            <div class="parts-section">
+                <div class="parts-title">Parts Used</div>
+                <div class="parts-list">
+                    {% for item in bill.items.all %}
+                    <div class="part-item">
+                        <span class="part-name">{{ item.part_name }} (x{{ item.quantity }})</span>
+                        <span class="part-price">₹{{ item.subtotal }}</span>
+                    </div>
+                    {% empty %}
+                    <div style="text-align: center; color: #64748b; padding: 1rem;">No parts used</div>
+                    {% endfor %}
+                    <div class="part-item"
+                        style="font-weight: 700; margin-top: 0.5rem; padding-top: 1rem; border-top: 2px solid #e2e8f0;">
+                        <span>Parts Total</span>
+                        <span>₹{{ bill.parts_total }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="color: #64748b; font-size: 0.9rem;">
+                    Submitted: {{ bill.submitted_at|date:"M d, Y g:i A" }}
+                </div>
+                <a href="{% url 'review_bill' bill.id %}" class="btn-review">Review & Approve →</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div style="font-size: 4rem; margin-bottom: 1rem;">✓</div>
+        <h3 style="margin-bottom: 0.5rem;">No Pending Bills</h3>
+        <p>All bills have been reviewed and approved</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

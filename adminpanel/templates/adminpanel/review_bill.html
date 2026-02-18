@@ -1,0 +1,318 @@
+{% extends 'adminpanel/base_admin.html' %}
+
+{% block title %}Review Bill #{{ bill.id }}{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .review-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .bill-summary {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+    }
+
+    .bill-summary h2 {
+        font-size: 1.8rem;
+        margin-bottom: 1rem;
+    }
+
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+
+    .summary-item {
+        background: rgba(255, 255, 255, 0.15);
+        padding: 1rem;
+        border-radius: 8px;
+    }
+
+    .summary-label {
+        font-size: 0.85rem;
+        opacity: 0.9;
+        margin-bottom: 0.4rem;
+    }
+
+    .summary-value {
+        font-size: 1.2rem;
+        font-weight: 700;
+    }
+
+    .section-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .section-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        color: #0f172a;
+        padding-bottom: 0.8rem;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    .parts-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .parts-table th {
+        background: #f8fafc;
+        padding: 1rem;
+        text-align: left;
+        font-weight: 600;
+        color: #475569;
+        font-size: 0.9rem;
+    }
+
+    .parts-table td {
+        padding: 1rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .parts-table tfoot td {
+        font-weight: 700;
+        font-size: 1.1rem;
+        background: #f8fafc;
+        border-top: 2px solid #e2e8f0;
+    }
+
+    .time-info {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+    }
+
+    .time-box {
+        background: #f8fafc;
+        padding: 1.5rem;
+        border-radius: 8px;
+        text-align: center;
+    }
+
+    .time-label {
+        font-size: 0.85rem;
+        color: #64748b;
+        margin-bottom: 0.5rem;
+    }
+
+    .time-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    .labour-form {
+        background: #fef3c7;
+        border: 2px solid #fbbf24;
+        border-radius: 10px;
+        padding: 2rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #0f172a;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: #3b82f6;
+    }
+
+    .total-display {
+        background: #f8fafc;
+        padding: 1.5rem;
+        border-radius: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 1.3rem;
+        font-weight: 700;
+    }
+
+    .btn-approve {
+        background: #10b981;
+        color: white;
+        padding: 1.2rem 2.5rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        width: 100%;
+    }
+
+    .btn-approve:hover {
+        background: #059669;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-back {
+        background: #64748b;
+        color: white;
+        padding: 0.8rem 1.5rem;
+        border-radius: 8px;
+        text-decoration: none;
+        display: inline-block;
+        margin-bottom: 2rem;
+    }
+
+    .btn-back:hover {
+        background: #475569;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="review-container">
+    <a href="{% url 'pending_bills' %}" class="btn-back">← Back to Pending Bills</a>
+
+    <div class="bill-summary">
+        <h2>Bill #{{ bill.id }} - Review & Approval</h2>
+        <div class="summary-grid">
+            <div class="summary-item">
+                <div class="summary-label">Customer</div>
+                <div class="summary-value">{{ bill.jobcard.booking.customer.user.username }}</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">Mechanic</div>
+                <div class="summary-value">{{ bill.jobcard.mechanic.username }}</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">Service Type</div>
+                <div class="summary-value">{{ bill.jobcard.booking.get_service_type_display }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Work Time Information -->
+    <div class="section-card">
+        <h3 class="section-title">⏱️ Work Time Details</h3>
+        <div class="time-info">
+            <div class="time-box">
+                <div class="time-label">Start Time</div>
+                <div class="time-value">{{ bill.jobcard.work_start_time|date:"g:i A" }}</div>
+                <div style="color: #64748b; font-size: 0.85rem; margin-top: 0.3rem;">
+                    {{ bill.jobcard.work_start_time|date:"M d, Y" }}
+                </div>
+            </div>
+            <div class="time-box">
+                <div class="time-label">End Time</div>
+                <div class="time-value">{{ bill.jobcard.work_end_time|date:"g:i A" }}</div>
+                <div style="color: #64748b; font-size: 0.85rem; margin-top: 0.3rem;">
+                    {{ bill.jobcard.work_end_time|date:"M d, Y" }}
+                </div>
+            </div>
+            <div class="time-box" style="background: #dbeafe;">
+                <div class="time-label">Total Labour Hours</div>
+                <div class="time-value" style="color: #1e40af;">{{ labour_hours }} hrs</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Parts Used -->
+    <div class="section-card">
+        <h3 class="section-title">🔧 Parts Used</h3>
+        <table class="parts-table">
+            <thead>
+                <tr>
+                    <th>Part Name</th>
+                    <th>Quantity</th>
+                    <th>Unit Price</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in bill_items %}
+                <tr>
+                    <td>{{ item.part_name }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>₹{{ item.unit_price }}</td>
+                    <td>₹{{ item.subtotal }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" style="text-align: center; color: #64748b; padding: 2rem;">
+                        No parts used for this job
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3">Parts Total</td>
+                    <td>₹{{ parts_total }}</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <!-- Labour Cost Form -->
+    <div class="section-card">
+        <h3 class="section-title">💰 Add Labour Cost</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="labour-form">
+                <div class="form-group">
+                    <label class="form-label">Labour Cost (₹)</label>
+                    <input type="number" name="labour_cost" class="form-input" placeholder="Enter labour cost in rupees"
+                        step="0.01" required id="labour-cost-input" oninput="calculateTotal()">
+                    <div style="margin-top: 0.5rem; color: #92400e; font-size: 0.9rem;">
+                        💡 Suggested: ₹{{ labour_hours|floatformat:0 }}00 (₹500/hour × {{ labour_hours }} hours)
+                    </div>
+                </div>
+
+                <div class="total-display" id="total-display">
+                    <span>Total Bill Amount</span>
+                    <span id="total-amount">₹{{ parts_total }}</span>
+                </div>
+            </div>
+
+            <div style="margin-top: 2rem;">
+                <button type="submit" class="btn-approve">✓ Approve Bill & Complete Booking</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    const partsTotal = {{ parts_total }};
+
+    function calculateTotal() {
+        const labourCost = parseFloat(document.getElementById('labour-cost-input').value) || 0;
+        const total = partsTotal + labourCost;
+        document.getElementById('total-amount').textContent = '₹' + total.toFixed(2);
+    }
+</script>
+{% endblock %}

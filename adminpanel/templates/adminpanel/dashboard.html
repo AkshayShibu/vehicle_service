@@ -1,0 +1,193 @@
+{% extends 'adminpanel/base_admin.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border-left: 4px solid #3b82f6;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .stat-card.warning {
+        border-left-color: #f59e0b;
+    }
+
+    .stat-card.success {
+        border-left-color: #10b981;
+    }
+
+    .stat-card.danger {
+        border-left-color: #ef4444;
+    }
+
+    .stat-label {
+        font-size: 0.85rem;
+        color: #64748b;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    .stat-icon {
+        font-size: 2rem;
+        opacity: 0.3;
+        float: right;
+    }
+
+    .section-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: #0f172a;
+    }
+
+    .booking-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .booking-table th {
+        background: #f8fafc;
+        padding: 1rem;
+        text-align: left;
+        font-weight: 600;
+        color: #475569;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .booking-table td {
+        padding: 1rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .booking-table tr:hover {
+        background: #f8fafc;
+    }
+
+    .status-badge {
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .status-pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .status-approved {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+
+    .status-in_progress {
+        background: #fed7aa;
+        color: #9a3412;
+    }
+
+    .status-completed {
+        background: #d1fae5;
+        color: #065f46;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Dashboard</h1>
+    <p class="page-subtitle">Overview of your vehicle service management system</p>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div class="stat-label">Total Users</div>
+        <div class="stat-value">{{ total_users }}</div>
+    </div>
+
+    <div class="stat-card success">
+        <div class="stat-icon">🚗</div>
+        <div class="stat-label">Total Customers</div>
+        <div class="stat-value">{{ total_customers }}</div>
+    </div>
+
+    <div class="stat-card warning">
+        <div class="stat-icon">🔧</div>
+        <div class="stat-label">Pending Mechanics</div>
+        <div class="stat-value">{{ pending_mechanics }}</div>
+    </div>
+
+    <div class="stat-card warning">
+        <div class="stat-icon">📅</div>
+        <div class="stat-label">Pending Bookings</div>
+        <div class="stat-value">{{ pending_bookings }}</div>
+    </div>
+
+    <div class="stat-card danger">
+        <div class="stat-icon">💰</div>
+        <div class="stat-label">Pending Bills</div>
+        <div class="stat-value">{{ pending_bills }}</div>
+    </div>
+</div>
+
+<div class="content-wrapper">
+    <h2 class="section-title">Recent Bookings</h2>
+
+    {% if recent_bookings %}
+    <table class="booking-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Customer</th>
+                <th>Service Type</th>
+                <th>Date</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for booking in recent_bookings %}
+            <tr>
+                <td>#{{ booking.id }}</td>
+                <td>{{ booking.customer.user.username }}</td>
+                <td>{{ booking.get_service_type_display }}</td>
+                <td>{{ booking.preferred_date|date:"M d, Y" }}</td>
+                <td>
+                    <span class="status-badge status-{{ booking.status }}">
+                        {{ booking.get_status_display }}
+                    </span>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="text-align: center; color: #64748b; padding: 2rem;">No recent bookings</p>
+    {% endif %}
+</div>
+{% endblock %}

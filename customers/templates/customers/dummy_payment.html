@@ -1,0 +1,124 @@
+{% extends 'customers/base_customer.html' %}
+
+{% block title %}Secure Payment{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width: 550px; margin: 0 auto; font-family: 'Inter', sans-serif;">
+    <div
+        style="background: white; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); padding: 40px; text-align: center;">
+        <div
+            style="width: 70px; height: 70px; background: #eff6ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px;">
+            <span style="font-size: 30px;">💳</span>
+        </div>
+
+        <h1 style="font-size: 24px; font-weight: 700; color: #1e293b; margin-bottom: 8px;">Secure Card Payment</h1>
+        <p style="color: #64748b; margin-bottom: 30px;">Complete your payment for Booking #{{ bill.jobcard.booking.id }}
+        </p>
+
+        <div
+            style="background: #f8fafc; padding: 25px; border-radius: 12px; margin-bottom: 30px; text-align: left; border: 1px solid #e2e8f0;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                <span style="color: #64748b; font-size: 14px; font-weight: 500;">Payable Amount:</span>
+                <span style="color: #3b82f6; font-weight: 800; font-size: 22px;">₹{{ bill.total_amount }}</span>
+            </div>
+            <div style="font-size: 12px; color: #94a3b8;">Transaction Reference: #{{ bill.id }}</div>
+        </div>
+
+        <form method="post" id="payment-form">
+            {% csrf_token %}
+
+            <div style="text-align: left; margin-bottom: 20px;">
+                <label
+                    style="display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 8px;">CARDHOLDER
+                    NAME</label>
+                <input type="text" name="cardholder_name" placeholder="John Doe" required
+                    style="width: 100%; padding: 12px 15px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 15px; transition: border-color 0.2s;">
+            </div>
+
+            <div style="text-align: left; margin-bottom: 20px;">
+                <label
+                    style="display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 8px;">CARD
+                    NUMBER</label>
+                <div style="position: relative;">
+                    <input type="text" name="card_number" id="card_number" placeholder="XXXX XXXX XXXX XXXX"
+                        maxlength="19" required
+                        style="width: 100%; padding: 12px 15px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 15px; letter-spacing: 2px;">
+                    <span
+                        style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 18px; opacity: 0.5;">Visa/MC</span>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 35px;">
+                <div style="text-align: left;">
+                    <label
+                        style="display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 8px;">EXPIRY
+                        DATE</label>
+                    <input type="text" name="expiry" id="expiry" placeholder="MM / YY" maxlength="7" required
+                        style="width: 100%; padding: 12px 15px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 15px; text-align: center;">
+                </div>
+                <div style="text-align: left;">
+                    <label
+                        style="display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 8px;">CVV</label>
+                    <input type="password" name="cvv" placeholder="XXX" maxlength="3" required
+                        style="width: 100%; padding: 12px 15px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 15px; text-align: center;">
+                </div>
+            </div>
+
+            <button type="submit" id="pay-btn"
+                style="width: 100%; background: #2563eb; color: white; padding: 18px; border: none; border-radius: 12px; font-weight: 700; font-size: 16px; cursor: pointer; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3); transition: all 0.2s;">
+                Submit Payment of ₹{{ bill.total_amount }}
+            </button>
+        </form>
+
+        <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid #f1f5f9;">
+            <a href="{% url 'view_bill' bill.jobcard.booking.id %}"
+                style="color: #94a3b8; text-decoration: none; font-size: 14px; font-weight: 500;">← Cancel and return to
+                invoice</a>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 20px; color: #94a3b8; font-size: 12px;">
+        🔒 This is a secure 256-bit SSL encrypted payment.
+    </div>
+</div>
+
+<script>
+    const form = document.getElementById('payment-form');
+    const btn = document.getElementById('pay-btn');
+
+    form.onsubmit = function () {
+        btn.innerHTML = 'Verifying with Bank...';
+        btn.style.opacity = '0.7';
+        btn.style.pointerEvents = 'none';
+    };
+
+    const cardInput = document.getElementById('card_number');
+    cardInput.oninput = function (e) {
+        let value = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+        let formattedValue = '';
+        for (let i = 0; i < value.length; i++) {
+            if (i > 0 && i % 4 === 0) formattedValue += ' ';
+            formattedValue += value[i];
+        }
+        e.target.value = formattedValue;
+    };
+
+    const expiryInput = document.getElementById('expiry');
+    expiryInput.oninput = function (e) {
+        let value = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+        if (value.length > 2) {
+            e.target.value = value.substring(0, 2) + ' / ' + value.substring(2, 4);
+        } else {
+            e.target.value = value;
+        }
+    };
+</script>
+
+<style>
+    input:focus {
+        outline: none;
+        border-color: #3b82f6 !important;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    }
+</style>
+{% endblock %}

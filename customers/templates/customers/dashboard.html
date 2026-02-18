@@ -1,0 +1,469 @@
+{% extends 'customers/base_customer.html' %}
+
+{% block title %}My Dashboard{% endblock %}
+
+{% block extra_styles %}
+<style>
+    th {
+        padding: 5px;
+
+    }
+
+    td {
+        padding: 5px;
+    }
+
+    .vehicles-list {
+        list-style: none;
+    }
+
+    .vehicles-list li {
+        padding: 1.1rem 1.3rem;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        font-size: 1.05rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: all 0.2s ease;
+    }
+
+    .vehicles-list li:hover {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+    }
+
+    .vehicles-list li .vehicle-info {
+        font-weight: 500;
+    }
+
+    .vehicles-list .empty {
+        color: #64748b;
+        font-style: italic;
+        padding: 1.5rem;
+        text-align: center;
+        background: #f8fafc;
+        border-radius: 8px;
+        border: 1px dashed #cbd5e1;
+    }
+
+    /* Booking Cards */
+    .booking-card {
+        background: #ffffff;
+        /* pure white */
+        border: 2px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 1.6rem;
+        margin-bottom: 1.8rem;
+        /* more gap */
+        transition: all 0.25s ease;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+    }
+
+    .booking-card:hover {
+        border-color: #cbd5e1;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .booking-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .booking-id {
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: #1e293b;
+    }
+
+    .status-badge {
+        padding: 0.4rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .status-pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .status-approved {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+
+    .status-in_progress {
+        background: #fed7aa;
+        color: #9a3412;
+    }
+
+    .status-completed {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .status-cancelled {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .status-confirmed-btn {
+        background: #e0f2fe;
+        color: #0369a1;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        border: 1px solid #7dd3fc;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-cancel {
+        background: #fff1f2;
+        color: #e11d48;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        border: 1px solid #fecdd3;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+    .btn-cancel:hover {
+        background: #ffe4e6;
+        border-color: #fda4af;
+    }
+
+    .booking-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .booking-detail {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .booking-detail-label {
+        font-size: 0.85rem;
+        color: #64748b;
+        margin-bottom: 0.3rem;
+        font-weight: 500;
+    }
+
+    .booking-detail-value {
+        font-size: 1rem;
+        color: #1e293b;
+        font-weight: 500;
+    }
+
+    .empty-state {
+        text-align: center;
+        color: #64748b;
+        font-size: 1rem;
+        padding: 2rem;
+        background: #f8fafc;
+        border-radius: 8px;
+        border: 1px dashed #cbd5e1;
+    }
+
+    .empty-state-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    .logout-link {
+        display: block;
+        text-align: center;
+        margin-top: 3rem;
+        color: #64748b;
+        font-size: 0.98rem;
+    }
+
+    .logout-link a {
+        color: #ef4444;
+        font-weight: 500;
+        text-decoration: none;
+    }
+
+    .logout-link a:hover {
+        text-decoration: underline;
+    }
+
+    .section .booking-card:not(:last-child)::after {
+        content: "";
+        display: block;
+        height: 1px;
+        background: #e5e7eb;
+        margin-top: 1.5rem;
+    }
+
+    .history-card {
+        background: transparent !important;
+        /* Remove card background */
+        border: none !important;
+        /* Remove card border */
+        box-shadow: none !important;
+        /* Remove shadow */
+        padding: 1.5rem 0;
+        /* Vertical padding only */
+        margin-bottom: 0 !important;
+        /* Remove margin */
+        border-radius: 0;
+        position: relative;
+    }
+
+    .history-container {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .history-card:not(:last-child) {
+        border-bottom: 4px solid #b1b1b1 !important;
+        /* Thick gray line from your screenshot */
+    }
+
+    /* Layout adjustment to match screenshot (Paid button to the right) */
+    .history-content-wrapper {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+    .history-details-left {
+        flex: 1;
+    }
+
+    .history-actions-right {
+        text-align: right;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h2>Welcome, {{ request.user.username }}!</h2>
+    <p>Manage your vehicles and service bookings</p>
+</div>
+
+<div class="section">
+    <h3>My Vehicles</h3>
+    <ul class="vehicles-list">
+        {% for vehicle in vehicles %}
+        <li>
+            <div class="vehicle-info">
+                {{ vehicle.vehicle_number }} - {{ vehicle.vehicle_type }}
+            </div>
+        </li>
+        {% empty %}
+        <li class="empty">No vehicles added yet. Add your first vehicle to get started!</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'add_vehicle' %}" class="btn-primary" style="margin-top: 1.2rem;">+ Add New Vehicle</a>
+</div>
+
+<div class="section">
+    <h3>Current Bookings</h3>
+
+    {% if active_bookings %}
+    {% for booking in active_bookings %}
+    <div class="booking-card">
+        <div class="booking-header">
+            <table border style="width: 100%;margin-bottom: 15px;border: solid;">
+                <tr><th>
+                    Booking id
+                </th>
+                <th>Service type</th>
+                <th>Problem Details</th>
+                <th>Scheduled date</th>
+                <th>Scheduled time</th>
+                <th>Status</th>
+            </tr>
+            <tr>
+                <th>
+                  Booking #{{ booking.id }}  
+                </th>
+                <th>{{ booking.get_service_type_display }}</th>
+                <th>{{ booking.problem_description }}</th>
+                <th>{{ booking.preferred_date|date:"M d, Y" }}</th>
+                <th>{{ booking.preferred_time|time:"g:i A" }}</th>
+                <th>{{ booking.get_status_display }}</th>
+            </tr>
+            </table>
+
+            <!-- <div class="booking-id">Booking #{{ booking.id }}</div>
+            <span class="status-badge status-{{ booking.status }}">
+                {{ booking.get_status_display }}
+            </span> -->
+        </div>
+
+        <!-- <div class="booking-details">
+            <div class="booking-detail">
+                <div class="booking-detail-label">Service Type</div>
+                <div class="booking-detail-value">{{ booking.get_service_type_display }}</div>
+            </div>
+
+            <div class="booking-detail">
+                <div class="booking-detail-label">Scheduled Date</div>
+                <div class="booking-detail-value">{{ booking.preferred_date|date:"M d, Y" }}</div>
+            </div>
+
+            <div class="booking-detail">
+                <div class="booking-detail-label">Scheduled Time</div>
+                <div class="booking-detail-value">{{ booking.preferred_time|time:"g:i A" }}</div>
+            </div>
+        </div>
+
+        {% if booking.problem_description %}
+        <div class="booking-detail" style="margin-top: 1rem;">
+            <div class="booking-detail-label">Problem Description</div>
+            <div class="booking-detail-value">{{ booking.problem_description }}</div>
+        </div>
+        {% endif %} -->
+
+        <div style="
+  margin-top: 1.5rem; 
+  display: flex; 
+  justify-content: center;          /* ← changed from flex-end to center */
+  align-items: center; 
+  gap: 1.25rem;
+  width: 100%;
+">
+
+  {% if booking.status == 'pending' %}
+    <a href="{% url 'cancel_booking' booking.id %}"
+       onclick="return confirm('Are you sure you want to cancel this booking?');"
+       style="
+         display: inline-flex;
+         align-items: center;
+         justify-content: center;
+         min-width: 180px;                /* ← makes it feel more stretched / substantial */
+         padding: 0.75rem 1.8rem;         /* bigger padding → visually wider */
+         font-size: 1rem;
+         font-weight: 500;
+         color: #b91c1c;
+         background-color: #fef2f2;
+         border: 1px solid #fecaca;
+         border-radius: 10px;
+         text-decoration: none;
+         transition: all 0.2s ease;
+         box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+       "
+       onmouseover="this.style.backgroundColor='#fee2e2'; this.style.borderColor='#f87171'; this.style.boxShadow='0 3px 8px rgba(239,68,68,0.18)';"
+       onmouseout="this.style.backgroundColor='#fef2f2'; this.style.borderColor='#fecaca'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)';"
+    >
+      Cancel Booking
+    </a>
+
+  {% elif booking.status == 'approved' or booking.status == 'in_progress' %}
+    <div style="
+         display: inline-flex;
+         align-items: center;
+         justify-content: center;
+         min-width: 160px;                /* ← matching width feel */
+         padding: 0.65rem 2rem;           /* wider horizontally */
+         font-size: 1rem;
+         font-weight: 550;
+         color: #14532d;
+         background: linear-gradient(to bottom, #f0fdf4, #ecfdf5);
+         border: 1px solid #86efac;
+         border-radius: 999px;
+         box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+       ">
+      <span style="font-size: 1.2rem; line-height: 1; margin-right: 0.35rem;">✓</span>
+      Confirmed
+    </div>
+  {% endif %}
+
+</div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-state-icon">📅</div>
+        <p>No active bookings.</p>
+    </div>
+    {% endif %}
+
+    <a href="{% url 'create_booking' %}" class="btn-primary" style="background: #10b981; margin-top: 1.2rem;">📅 Book a
+        Service</a>
+</div>
+
+<div class="section">
+    <h3>Service History</h3>
+    <table border style="width: 100%;margin-bottom: 15px;border: solid;">
+        <th>booking id</th>
+
+        <th>type</th>
+
+        <th>date</th>
+
+
+        <th>status</th>
+
+        <th>payment</th>
+
+        {% if completed_bookings %}
+        {% for booking in completed_bookings %}
+        <tr>
+            <td>{{ booking.id }}</td>
+            <td>{{ booking.get_service_type_display }}</td>
+            <td>{{ booking.preferred_date|date:"M d, Y" }}</td>
+            <td>{{ booking.status }}</td>
+            <td>{% if booking.status == 'completed' %}
+                <div style="margin-top: 1rem; ">
+                    {% with jc=booking.jobcard_set.first %}
+                    {% if jc and jc.bill and jc.bill.is_paid %}
+                    <span
+                        style="display: inline-block; padding: 0.5rem 1.5rem;margin-left: 25px; background: #d1fae5; color: #065f46; border-radius: 6px; font-weight: 700; font-size: 0.9rem; border: 1px solid #10b981;">
+                        ✓ Paid
+                    </span>
+                    <a href="{% url 'view_bill' booking.id %}"
+                        style="display: inline-block; color: #3b82f6; text-decoration: none; font-size: 0.85rem; font-weight: 600; margin-left: 15px;">View
+                        Receipt</a>
+                    {% elif jc and jc.bill %}
+                    <a href="{% url 'view_bill' booking.id %}" class="btn-primary"
+                        style="padding: 0.5rem 1rem; font-size: 0.9rem;">
+                        View Bill & Pay
+                    </a>
+                    {% elif jc %}
+                    <span style="color: #64748b; font-size: 0.85rem; font-style: italic;">Bill pending
+                        Generation...</span>
+                    {% else %}
+                    <span style="color: #64748b; font-size: 0.85rem; font-style: italic;">Processing...</span>
+                    {% endif %}
+                    {% endwith %}
+                </div>
+                {% endif %}
+            </td>
+        </tr>
+
+        {% endfor %}
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">📋</div>
+            <p>No past services found.</p>
+        </div>
+        {% endif %}
+    </table>
+    <div class="logout-link">
+        <a href="{% url 'logout' %}">Logout</a> • Need help? Contact support
+    </div>
+    {% endblock %}

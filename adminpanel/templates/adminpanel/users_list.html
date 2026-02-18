@@ -1,0 +1,129 @@
+{% extends 'adminpanel/base_admin.html' %}
+
+{% block title %}Users List{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .users-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .user-count {
+        background: #3b82f6;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+    }
+
+    .users-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .users-table th {
+        background: #f8fafc;
+        padding: 1rem;
+        text-align: left;
+        font-weight: 600;
+        color: #475569;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+    }
+
+    .users-table td {
+        padding: 1rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .users-table tr:hover {
+        background: #f8fafc;
+    }
+
+    .role-badge {
+        padding: 0.3rem 0.7rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .role-admin {
+        background: #fecaca;
+        color: #991b1b;
+    }
+
+    .role-customer {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+
+    .role-mechanic {
+        background: #d1fae5;
+        color: #065f46;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Users Management</h1>
+    <p class="page-subtitle">View and manage all registered users</p>
+</div>
+
+<div class="content-wrapper">
+    <div class="users-header">
+        <h2 style="font-size: 1.2rem; font-weight: 600;">All Users</h2>
+        <div class="user-count">Total: {{ total_count }} users</div>
+    </div>
+
+    <table class="users-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Joined Date</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>#{{ user.id }}</td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.email|default:"N/A" }}</td>
+                <td>
+                    {% if user.is_superuser or user.is_staff %}
+                    <span class="role-badge role-admin">Admin</span>
+                    {% elif user.mechanic_profile %}
+                    <span class="role-badge role-mechanic">Mechanic</span>
+                    {% elif user.customer_profile %}
+                    <span class="role-badge role-customer">Customer</span>
+                    {% else %}
+                    <span class="role-badge">User</span>
+                    {% endif %}
+                </td>
+                <td>{{ user.date_joined|date:"M d, Y" }}</td>
+                <td>
+                    {% if user.is_active %}
+                    <span style="color: #10b981; font-weight: 500;">✓ Active</span>
+                    {% else %}
+                    <span style="color: #ef4444; font-weight: 500;">✗ Inactive</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" style="text-align: center; padding: 2rem; color: #64748b;">
+                    No users found
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

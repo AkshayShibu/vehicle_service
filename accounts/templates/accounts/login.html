@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Login - Vehicle Service</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #1e293b;
+        }
+
+        .login-container {
+            background: white;
+            width: 100%;
+            max-width: 420px;
+            border-radius: 16px;
+            box-shadow: 0 10px 38px rgba(0, 0, 0, 0.08),
+                        0 4px 12px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+        }
+
+        .login-header {
+            background: #0f172a;
+            color: white;
+            padding: 2.2rem 2rem 1.8rem;
+            text-align: center;
+        }
+
+        .login-header h2 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .form-content {
+            padding: 2.2rem 2.5rem 2rem;
+        }
+
+        .error-message {
+            color: #ef4444;
+            font-size: 0.92rem;
+            margin-bottom: 1.3rem;
+            padding: 10px 14px;
+            background: #fef2f2;
+            border-radius: 8px;
+            border-left: 4px solid #ef4444;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.55rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #334155;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 0.95rem 1.1rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            background: #f8fafc;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+            background: white;
+        }
+
+        button {
+            width: 100%;
+            padding: 1rem;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.03rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            margin: 1.6rem 0 1.3rem;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #e2e8f0;
+            margin: 1.8rem 0;
+        }
+
+        .register-options {
+            text-align: center;
+            font-size: 0.97rem;
+            color: #64748b;
+        }
+
+        .register-options p {
+            margin: 1rem 0;
+        }
+
+        .register-options a {
+            color: #2563eb;
+            font-weight: 500;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .register-options a:hover {
+            color: #1d4ed8;
+            text-decoration: underline;
+        }
+
+        @media (max-width: 480px) {
+            .form-content {
+                padding: 1.8rem 1.6rem;
+            }
+            .login-header {
+                padding: 2rem 1.6rem 1.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <div class="login-header">
+        <h2>Vehicle Service</h2>
+    </div>
+
+    <div class="form-content">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="error-message">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+
+            <label for="username">Username</label>
+            <input type="text" name="username" id="username" required autocomplete="username">
+
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password" required autocomplete="current-password">
+
+            <button type="submit">Sign In</button>
+        </form>
+
+        <hr>
+
+        <div class="register-options">
+            <p>New customer? <a href="{% url 'customer_register' %}">Register as Customer</a></p>
+            <p>Mechanic? <a href="{% url 'mechanic_register' %}">Register as Mechanic</a></p>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

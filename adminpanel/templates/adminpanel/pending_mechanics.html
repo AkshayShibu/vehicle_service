@@ -1,0 +1,254 @@
+{% extends 'adminpanel/base_admin.html' %}
+
+{% block title %}Mechanics Management{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .tabs {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    .tab {
+        padding: 1rem 1.5rem;
+        background: none;
+        border: none;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #64748b;
+        cursor: pointer;
+        border-bottom: 3px solid transparent;
+        transition: all 0.2s ease;
+    }
+
+    .tab.active {
+        color: #3b82f6;
+        border-bottom-color: #3b82f6;
+    }
+
+    .tab-content {
+        display: none;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    .mechanic-card {
+        background: #f8fafc;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        transition: all 0.2s ease;
+    }
+
+    .mechanic-card:hover {
+        border-color: #cbd5e1;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .mechanic-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .mechanic-name {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #0f172a;
+    }
+
+    .mechanic-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .detail-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .detail-label {
+        font-size: 0.85rem;
+        color: #64748b;
+        margin-bottom: 0.3rem;
+    }
+
+    .detail-value {
+        font-weight: 500;
+        color: #0f172a;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.8rem;
+    }
+
+    .btn {
+        padding: 0.6rem 1.2rem;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-approve {
+        background: #10b981;
+        color: white;
+    }
+
+    .btn-approve:hover {
+        background: #059669;
+    }
+
+    .btn-reject {
+        background: #ef4444;
+        color: white;
+    }
+
+    .btn-reject:hover {
+        background: #dc2626;
+    }
+
+    .approved-badge {
+        background: #d1fae5;
+        color: #065f46;
+        padding: 0.4rem 0.8rem;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: #64748b;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Mechanics Management</h1>
+    <p class="page-subtitle">Approve and manage mechanic registrations</p>
+</div>
+
+<div class="content-wrapper">
+    <div class="tabs">
+        <button class="tab active" onclick="showTab('pending')">
+            Pending Approval ({{ pending_mechanics.count }})
+        </button>
+        <button class="tab" onclick="showTab('approved')">
+            Approved Mechanics ({{ approved_mechanics.count }})
+        </button>
+    </div>
+
+    <!-- Pending Mechanics Tab -->
+    <div id="pending-tab" class="tab-content active">
+        {% if pending_mechanics %}
+        {% for mechanic in pending_mechanics %}
+        <div class="mechanic-card">
+            <div class="mechanic-header">
+                <div class="mechanic-name">{{ mechanic.user.username }}</div>
+            </div>
+
+            <div class="mechanic-details">
+                <div class="detail-item">
+                    <div class="detail-label">Email</div>
+                    <div class="detail-value">{{ mechanic.user.email|default:"N/A" }}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Phone</div>
+                    <div class="detail-value">{{ mechanic.phone }}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Experience</div>
+                    <div class="detail-value">{{ mechanic.experience }} years</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Registered On</div>
+                    <div class="detail-value">{{ mechanic.user.date_joined|date:"M d, Y" }}</div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <a href="{% url 'approve_mechanic' mechanic.id %}" class="btn btn-approve">✓ Approve</a>
+                <a href="{% url 'reject_mechanic' mechanic.id %}" class="btn btn-reject"
+                    onclick="return confirm('Are you sure you want to reject this mechanic?')">✗ Reject</a>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="empty-state">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">✓</div>
+            <p>No pending mechanic approvals</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Approved Mechanics Tab -->
+    <div id="approved-tab" class="tab-content">
+        {% if approved_mechanics %}
+        {% for mechanic in approved_mechanics %}
+        <div class="mechanic-card">
+            <div class="mechanic-header">
+                <div class="mechanic-name">{{ mechanic.user.username }}</div>
+                <span class="approved-badge">✓ Approved</span>
+            </div>
+
+            <div class="mechanic-details">
+                <div class="detail-item">
+                    <div class="detail-label">Email</div>
+                    <div class="detail-value">{{ mechanic.user.email|default:"N/A" }}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Phone</div>
+                    <div class="detail-value">{{ mechanic.phone }}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Experience</div>
+                    <div class="detail-value">{{ mechanic.experience }} years</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Approved On</div>
+                    <div class="detail-value">{{ mechanic.approved_at|date:"M d, Y" }}</div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="empty-state">
+            <p>No approved mechanics yet</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    function showTab(tabName) {
+        // Hide all tabs
+        document.querySelectorAll('.tab-content').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+
+        // Show selected tab
+        document.getElementById(tabName + '-tab').classList.add('active');
+        event.target.classList.add('active');
+    }
+</script>
+{% endblock %}

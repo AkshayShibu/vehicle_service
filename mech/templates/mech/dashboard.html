@@ -1,0 +1,266 @@
+{% extends 'mech/base_mechanic.html' %}
+
+{% block title %}My Jobs{% endblock %}
+
+{% block extra_styles %}
+
+<style>
+:root {
+    --primary: #10b981;
+    --primary-dark: #059669;
+    --accent: #f59e0b;
+    --gray: #64748b;
+    --light: #f8fafc;
+    --border: #e2e8f0;
+    --shadow-sm: 0 4px 15px rgba(0,0,0,0.06);
+    --shadow-md: 0 12px 30px rgba(0,0,0,0.1);
+}
+
+/* GRID LAYOUT */
+.jobs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
+}
+
+/* CARD */
+.job-card {
+    background: white;
+    border-radius: 18px;
+    padding: 22px;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.25s ease;
+    border: 1px solid var(--border);
+    position: relative;
+}
+
+.job-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-md);
+}
+
+/* STATUS BADGE */
+.status-badge {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    background: #dcfce7;
+    color: #166534;
+}
+
+/* TITLE */
+.job-title {
+    font-size: 1.3rem;
+    font-weight: 800;
+    margin-bottom: 12px;
+    color: #111827;
+}
+
+/* INFO ROW */
+.job-info {
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+    color: var(--gray);
+}
+
+.job-info span {
+    font-weight: 600;
+    color: #111827;
+}
+
+/* BUTTONS */
+.job-actions {
+    margin-top: 16px;
+    display: flex;
+    gap: 10px;
+}
+
+.btn {
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--primary-dark);
+}
+
+.btn-secondary {
+    background: #f1f5f9;
+    color: #0f172a;
+}
+
+.btn-secondary:hover {
+    background: #e2e8f0;
+}
+
+/* COMPLETED GRID */
+.completed-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 22px;
+    margin-top: 10px;
+}
+
+/* Slight visual difference for completed */
+/* .job-card.completed {
+    border-left: 6px solid #10b981;
+    background: linear-gradient(180deg, #ffffff, #f9fffb);
+} */
+
+.job-card-completed{
+    background-color: #10b981;
+    border: 10px black solid;
+
+}
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">My Jobs</h1>
+    <p class="page-subtitle">Track and manage your vehicle service assignments effortlessly</p>
+</div>
+
+<div class="tabs">
+    <button class="tab active" onclick="showTab('active')">
+        Active Jobs ({{ active_jobs.count }})
+    </button>
+    <button class="tab" onclick="showTab('completed')">
+        Completed ({{ completed_jobs.count }})
+    </button>
+</div>
+
+<!-- Active Jobs -->
+<div id="active-tab" class="tab-content active">
+    {% if active_jobs %}
+        {% for job in active_jobs %}
+        <div class="job-card">
+            <div class="job-header">
+                <div class="job-id">Job #{{ job.id }}</div>
+                <span class="status-badge status-{{ job.booking.status }}">
+                    {{ job.booking.get_status_display }}
+                </span>
+            </div>
+
+            <div class="job-meta">
+                <div class="meta-item">
+                    <div class="meta-label">Customer</div>
+                    <div class="meta-value">@{{ job.booking.customer.user.username }}</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Service</div>
+                    <div class="meta-value">{{ job.booking.get_service_type_display }}</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Scheduled</div>
+                    <div class="meta-value">{{ job.booking.preferred_date|date:"d M Y" }}</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Assigned</div>
+                    <div class="meta-value">{{ job.created_at|date:"d M Y" }}</div>
+                </div>
+            </div>
+
+            {% if job.booking.problem_description %}
+            <div class="problem-text">
+                <strong>Customer Issue:</strong> {{ job.booking.problem_description }}
+            </div>
+            {% endif %}
+
+            <a href="{% url 'job_details' job.id %}" class="btn btn-primary">
+                Manage This Job →
+            </a>
+        </div>
+        {% endfor %}
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-emoji">🔧🚗💤</div>
+        <h3 class="empty-title">No Active Jobs at the Moment</h3>
+        <p style="color: var(--gray); font-size: 1.1rem;">Fresh bookings will show up here automatically. Stay ready!</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Completed Jobs -->
+<!-- Completed Jobs -->
+<div id="completed-tab" class="tab-content">
+    {% if completed_jobs %}
+
+    <div class="completed-grid">
+        {% for job in completed_jobs %}
+        <div class="job-card-completed" style="display: flex; justify-content: space-between; padding: 15px; border: 1px solid black; margin-top: 20px; border-radius: 10px;">
+
+            <div class="job-header">
+                <div class="job-id">Job #{{ job.id }}</div>
+                <span class="status-badge status-completed">Completed</span>
+            </div>
+
+            <div class="job-meta">
+                <div class="meta-item">
+                    <div class="meta-label">Customer</div>
+                    <div class="meta-value">@{{ job.booking.customer.user.username }}</div>
+                </div>
+
+                <div class="meta-item">
+                    <div class="meta-label">Service</div>
+                    <div class="meta-value">{{ job.booking.get_service_type_display }}</div>
+                </div>
+
+                <div class="meta-item">
+                    <div class="meta-label">Completed On</div>
+                    <div class="meta-value">{{ job.work_end_time|date:"d M Y" }}</div>
+                </div>
+
+                <div class="meta-item">
+                    <div class="meta-label">Labour Time</div>
+                    <div class="meta-value">{{ job.get_labour_hours }} hrs</div>
+                </div>
+            </div>
+
+            <a href="{% url 'job_details' job.id %}" class="btn btn-secondary">
+                View Bill
+            </a>
+
+        </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-emoji">🏆🔧</div>
+        <h3 class="empty-title">No Completed Jobs Yet</h3>
+        <p style="color: var(--gray); font-size: 1.1rem;">
+            Finish a job and watch your success list grow here.
+        </p>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    function showTab(tabName) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+
+        document.getElementById(tabName + '-tab').classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+</script>
+{% endblock %}

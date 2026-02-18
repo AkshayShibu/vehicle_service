@@ -1,0 +1,135 @@
+{% extends 'customers/base_customer.html' %}
+
+{% block title %}Service Invoice{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width: 800px; margin: 0 auto; font-family: 'Inter', sans-serif;">
+    <div style="background: white; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); overflow: hidden;">
+        <!-- Header -->
+        <div style="background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); padding: 30px; color: white;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h1 style="font-size: 24px; font-weight: 700; margin-bottom: 5px;">Service Invoice</h1>
+                    <p style="opacity: 0.8; font-size: 14px;">Invoice #INV-{{ bill.id }}</p>
+                </div>
+                <div style="text-align: right;">
+                    <span
+                        style="background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px; font-size: 13px; font-weight: 600;">
+                        {% if bill.is_paid %}PAID{% else %}UNPAID{% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div style="padding: 40px;">
+            <!-- Customer & Service Info -->
+            <div
+                style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 40px; padding-bottom: 30px; border-bottom: 1px solid #f1f5f9;">
+                <div>
+                    <h3
+                        style="font-size: 14px; text-transform: uppercase; color: #64748b; margin-bottom: 12px; letter-spacing: 0.5px;">
+                        Billed To</h3>
+                    <p style="font-weight: 600; color: #1e293b; margin-bottom: 5px; font-size: 18px;">{{
+                        request.user.username }}</p>
+                    <p style="color: #64748b; font-size: 14px;">{{ booking.customer.phone }}</p>
+                </div>
+                <div>
+                    <h3
+                        style="font-size: 14px; text-transform: uppercase; color: #64748b; margin-bottom: 12px; letter-spacing: 0.5px;">
+                        Service Details</h3>
+                    <p style="font-weight: 600; color: #1e293b; margin-bottom: 5px; font-size: 18px;">{{
+                        booking.get_service_type_display }}</p>
+                    <p style="color: #64748b; font-size: 14px;">{{ booking.preferred_date|date:"F d, Y" }}</p>
+                </div>
+            </div>
+
+            <!-- Items Table -->
+            <h3 style="font-size: 16px; font-weight: 600; color: #1e293b; margin-bottom: 20px;">Parts & Components</h3>
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 40px;">
+                <thead>
+                    <tr style="border-bottom: 2px solid #f1f5f9; text-align: left;">
+                        <th style="padding: 12px 0; color: #64748b; font-size: 13px; font-weight: 600;">Item</th>
+                        <th style="padding: 12px 0; color: #64748b; font-size: 13px; font-weight: 600;">Qty</th>
+                        <th
+                            style="padding: 12px 0; color: #64748b; font-size: 13px; font-weight: 600; text-align: right;">
+                            Unit Price</th>
+                        <th
+                            style="padding: 12px 0; color: #64748b; font-size: 13px; font-weight: 600; text-align: right;">
+                            Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for part in parts %}
+                    <tr style="border-bottom: 1px solid #f1f5f9;">
+                        <td style="padding: 15px 0; color: #1e293b; font-weight: 500;">{{ part.part_name }}</td>
+                        <td style="padding: 15px 0; color: #64748b;">{{ part.quantity }}</td>
+                        <td style="padding: 15px 0; color: #64748b; text-align: right;">₹{{ part.unit_price }}</td>
+                        <td style="padding: 15px 0; color: #1e293b; font-weight: 600; text-align: right;">₹{{
+                            part.subtotal }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4"
+                            style="padding: 30px 0; text-align: center; color: #94a3b8; font-style: italic;">No specific
+                            parts listed for this service.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <!-- Totals -->
+            <div
+                style="background: #f8fafc; border-radius: 12px; padding: 30px; margin-left: auto; max-width: 350px; border: 1px solid #e2e8f0;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                    <span style="color: #64748b; font-size: 15px;">Parts Total</span>
+                    <span style="color: #1e293b; font-weight: 600;">₹{{ bill.parts_total }}</span>
+                </div>
+                <div
+                    style="display: flex; justify-content: space-between; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #e2e8f0;">
+                    <span style="color: #64748b; font-size: 15px;">Labour Charges</span>
+                    <span style="color: #1e293b; font-weight: 600;">₹{{ bill.labour_cost }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="color: #1e293b; font-weight: 700; font-size: 18px;">Grand Total</span>
+                    <span style="color: #3b82f6; font-weight: 800; font-size: 24px;">₹{{ bill.total_amount }}</span>
+                </div>
+            </div>
+
+            <!-- Action Area -->
+            {% if not bill.is_paid %}
+            <div
+                style="margin-top: 50px; text-align: center; background: #f0f9ff; padding: 40px; border-radius: 16px; border: 1px dashed #3b82f6;">
+                <h4 style="color: #1e40af; font-size: 18px; font-weight: 700; margin-bottom: 10px;">Safe & Secure
+                    Payment</h4>
+                <p style="color: #64748b; margin-bottom: 30px; font-size: 14px;">Once you click below, you'll be taken
+                    to our secure payment gateway to enter your card details.</p>
+                <a href="{% url 'pay_bill' bill.id %}"
+                    style="display: inline-block; background: #10b981; color: white; padding: 18px 50px; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 16px; transition: all 0.2s ease; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);">
+                    Proceed to Payment
+                </a>
+            </div>
+            {% else %}
+            <div
+                style="margin-top: 50px; background: #ecfdf5; border: 2px solid #10b981; padding: 30px; border-radius: 16px; color: #065f46; text-align: center;">
+                <div style="font-size: 40px; margin-bottom: 15px;">✅</div>
+                <h4 style="font-weight: 800; font-size: 20px; margin-bottom: 5px;">Payment Received!</h4>
+                <p style="font-size: 15px; opacity: 0.9;">Thank you for your business. Your payment via {{
+                    bill.payment_method }} was processed on {{ bill.paid_at|date:"M d, Y" }} at {{
+                    bill.paid_at|time:"g:i A" }}.</p>
+                <div
+                    style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(16, 185, 129, 0.2); font-size: 13px;">
+                    Our team will now finalize the paperwork for your vehicle release.
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 40px;">
+        <a href="{% url 'customer_dashboard' %}"
+            style="color: #64748b; text-decoration: none; font-size: 15px; font-weight: 500; display: inline-flex; align-items: center; gap: 8px;">
+            <span>←</span> Back to Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}

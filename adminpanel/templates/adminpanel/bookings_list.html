@@ -1,0 +1,173 @@
+{% extends 'adminpanel/base_admin.html' %}
+
+{% block title %}Bookings Management{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .filter-bar {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .filter-btn {
+        padding: 0.7rem 1.2rem;
+        border: 2px solid #e2e8f0;
+        background: white;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .filter-btn.active {
+        background: #3b82f6;
+        color: white;
+        border-color: #3b82f6;
+    }
+
+    .bookings-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .bookings-table th {
+        background: #f8fafc;
+        padding: 1rem;
+        text-align: left;
+        font-weight: 600;
+        color: #475569;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+    }
+
+    .bookings-table td {
+        padding: 1rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .bookings-table tr:hover {
+        background: #f8fafc;
+    }
+
+    .status-badge {
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .status-pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .status-approved {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+
+    .status-in_progress {
+        background: #fed7aa;
+        color: #9a3412;
+    }
+
+    .status-completed {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .status-cancelled {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .btn-small {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-approve {
+        background: #10b981;
+        color: white;
+    }
+
+    .btn-approve:hover {
+        background: #059669;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Bookings Management</h1>
+    <p class="page-subtitle">View and manage all service bookings</p>
+</div>
+
+<div class="content-wrapper">
+    <div class="filter-bar">
+        <a href="?status=all" class="filter-btn {% if status_filter == 'all' %}active{% endif %}">All Bookings</a>
+        <a href="?status=pending" class="filter-btn {% if status_filter == 'pending' %}active{% endif %}">Pending</a>
+        <a href="?status=approved" class="filter-btn {% if status_filter == 'approved' %}active{% endif %}">Approved</a>
+        <a href="?status=in_progress" class="filter-btn {% if status_filter == 'in_progress' %}active{% endif %}">In
+            Progress</a>
+        <a href="?status=completed"
+            class="filter-btn {% if status_filter == 'completed' %}active{% endif %}">Completed</a>
+    </div>
+
+    {% if bookings %}
+    <table class="bookings-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Customer</th>
+                <th>Service Type</th>
+                <th>Preferred Date</th>
+                <th>Preferred Time</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for booking in bookings %}
+            <tr>
+                <td>#{{ booking.id }}</td>
+                <td>{{ booking.customer.user.username }}</td>
+                <td>{{ booking.get_service_type_display }}</td>
+                <td>{{ booking.preferred_date|date:"M d, Y" }}</td>
+                <td>{{ booking.preferred_time|time:"g:i A" }}</td>
+                <td>
+                    <span class="status-badge status-{{ booking.status }}">
+                        {{ booking.get_status_display }}
+                    </span>
+                </td>
+                <td>
+                    {% if booking.status == 'pending' %}
+                    <a href="{% url 'approve_booking' booking.id %}" class="btn-small btn-approve">
+                        Approve
+                    </a>
+                    {% else %}
+                    <span style="color: #64748b; font-size: 0.85rem;">—</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div style="text-align: center; padding: 3rem; color: #64748b;">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">📅</div>
+        <p>No bookings found</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

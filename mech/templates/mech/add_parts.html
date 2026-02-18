@@ -1,0 +1,7 @@
+<form method="post">
+    {% csrf_token %}
+    <input type="text" name="part_name">
+    <input type="number" name="quantity">
+    <input type="number" name="unit_price">
+    <button type="submit">Add Part</button>
+</form>

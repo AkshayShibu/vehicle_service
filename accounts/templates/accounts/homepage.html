@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Vehicle Service System – Kanayannur</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            color: #1e293b;
+            background: #f8fafc;
+            line-height: 1.6;
+        }
+
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            background: linear-gradient(rgba(15, 23, 42, 0.78), rgba(15, 23, 42, 0.85)),
+                        url('https://images.unsplash.com/photo-1606857521015-7f9fcf423740?auto=format&fit=crop&q=80&w=2000') center/cover no-repeat;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            padding: 2rem 1rem;
+        }
+
+        .hero-content {
+            max-width: 780px;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: clamp(2.8rem, 7vw, 4.8rem);
+            font-weight: 700;
+            margin-bottom: 1.2rem;
+            letter-spacing: -1px;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+
+        .hero p {
+            font-size: clamp(1.15rem, 3vw, 1.45rem);
+            margin-bottom: 2.5rem;
+            opacity: 0.95;
+            max-width: 620px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            justify-content: center;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 1.1rem 2.2rem;
+            font-size: 1.15rem;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(37,99,235,0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #0f172a;
+        }
+
+        .btn-secondary:hover {
+            background: #f1f5f9;
+            transform: translateY(-4px);
+        }
+
+        .features {
+            padding: 5rem 2rem 4rem;
+            background: white;
+            text-align: center;
+        }
+
+        .features h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.4rem;
+            margin-bottom: 3.5rem;
+            color: #0f172a;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: #f8fafc;
+            padding: 2.2rem 1.8rem;
+            border-radius: 16px;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.06);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 16px 40px rgba(0,0,0,0.12);
+        }
+
+        .feature-card h3 {
+            font-size: 1.45rem;
+            margin: 1.2rem 0 0.9rem;
+            color: #0f172a;
+        }
+
+        .feature-card p {
+            color: #475569;
+        }
+
+        .footer {
+            background: #0f172a;
+            color: #cbd5e1;
+            text-align: center;
+            padding: 2.5rem 1rem;
+            font-size: 0.95rem;
+        }
+
+        @media (max-width: 640px) {
+            .hero h1 { font-size: 2.8rem; }
+            .hero p  { font-size: 1.15rem; }
+            .btn     { padding: 0.95rem 1.8rem; font-size: 1.05rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="hero">
+    <div class="hero-content">
+        <h1>Welcome to Vehicle Service System</h1>
+        <p>Fast, reliable & trusted vehicle repair & maintenance in Kanayannur, Kerala. Book your service with expert mechanics today.</p>
+
+        <div class="cta-buttons">
+            <a href="{% url 'login' %}" class="btn btn-primary">Login to Your Account</a>
+            <a href="{% url 'customer_register' %}" class="btn btn-secondary">Register as Customer</a>
+            <a href="{% url 'mechanic_register' %}" class="btn btn-secondary">Join as Mechanic</a>
+        </div>
+    </div>
+</div>
+
+<section class="features">
+    <h2>Why Choose Us?</h2>
+    
+    <div class="feature-grid">
+        <div class="feature-card">
+            <h3>Expert Mechanics</h3>
+            <p>Verified professionals with years of experience ready to serve you.</p>
+        </div>
+        <div class="feature-card">
+            <h3>Quick Booking</h3>
+            <p>Book service for your car or bike in just a few clicks — anytime, anywhere.</p>
+        </div>
+        <div class="feature-card">
+            <h3>Transparent Pricing</h3>
+            <p>No hidden charges. Get fair quotes and quality service every time.</p>
+        </div>
+        <div class="feature-card">
+            <h3>Local Focus</h3>
+            <p>Proudly serving Kanayannur and nearby areas with fast response.</p>
+        </div>
+    </div>
+</section>
+
+<footer class="footer">
+    <p>© Vehicle Service System • Kanayannur, Kerala • Made with ❤️ for better vehicle care</p>
+</footer>
+
+</body>
+</html>

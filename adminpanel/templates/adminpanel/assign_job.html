@@ -1,0 +1,183 @@
+{% extends 'adminpanel/base_admin.html' %}
+
+{% block title %}Assign Jobs{% endblock %}
+
+{% block extra_styles %}
+<style>
+  .assign-form {
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #0f172a;
+  }
+
+  .form-select {
+    width: 100%;
+    padding: 0.9rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 1rem;
+    background: white;
+    cursor: pointer;
+  }
+
+  .form-select:focus {
+    outline: none;
+    border-color: #3b82f6;
+  }
+
+  .btn-assign {
+    background: #3b82f6;
+    color: white;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .btn-assign:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+  }
+
+  .bookings-grid {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .booking-item {
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1.2rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .booking-item:hover {
+    border-color: #cbd5e1;
+  }
+
+  .booking-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .booking-label {
+    font-size: 0.75rem;
+    color: #64748b;
+    margin-bottom: 0.2rem;
+  }
+
+  .booking-value {
+    font-weight: 600;
+    color: #0f172a;
+  }
+
+  .status-badge {
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    display: inline-block;
+  }
+
+  .status-pending {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  .status-approved {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">Assign Jobs to Mechanics</h1>
+  <p class="page-subtitle">Assign approved bookings to available mechanics</p>
+</div>
+
+<div class="content-wrapper">
+  <form method="post" class="assign-form">
+    {% csrf_token %}
+
+    <div class="form-group">
+      <label class="form-label">Select Booking</label>
+      <select name="booking_id" class="form-select" required>
+        <option value="">Choose a booking...</option>
+        {% for booking in bookings %}
+        <option value="{{ booking.id }}">
+          #{{ booking.id }} - {{ booking.customer.user.username }} - {{ booking.get_service_type_display }} ({{
+          booking.preferred_date|date:"M d, Y" }})
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Assign to Mechanic</label>
+      <select name="mechanic_id" class="form-select" required>
+        <option value="">Choose a mechanic...</option>
+        {% for mechanic in mechanics %}
+        <option value="{{ mechanic.user.id }}">
+          {{ mechanic.user.username }} ({{ mechanic.experience }} years exp)
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <button type="submit" class="btn-assign">Assign Job</button>
+  </form>
+
+  <h3 style="font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem;">Available Bookings</h3>
+
+  {% if bookings %}
+  <div class="bookings-grid">
+    {% for booking in bookings %}
+    <div class="booking-item">
+      <div class="booking-info">
+        <div class="booking-label">Booking ID</div>
+        <div class="booking-value">#{{ booking.id }}</div>
+      </div>
+      <div class="booking-info">
+        <div class="booking-label">Customer</div>
+        <div class="booking-value">{{ booking.customer.user.username }}</div>
+      </div>
+      <div class="booking-info">
+        <div class="booking-label">Service</div>
+        <div class="booking-value">{{ booking.get_service_type_display }}</div>
+      </div>
+      <span class="status-badge status-{{ booking.status }}">
+        {{ booking.get_status_display }}
+      </span>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div style="text-align: center; padding: 3rem; color: #64748b;">
+    <div style="font-size: 3rem; margin-bottom: 1rem;">✓</div>
+    <p>No bookings available for assignment</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
